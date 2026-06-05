@@ -1,0 +1,81 @@
+/**
+ * button.css
+ * สไตล์ควบคุมที่กดได้และใช้ซ้ำ: ชิปกรองหมวด, ปุ่มเปลี่ยนหน้า, dropdown เรียงลำดับ
+ * รวมไว้ที่เดียวเพราะเป็นรูปแบบ "control" ที่หน้าตาใกล้กัน (กฎข้อ 11)
+ */
+
+/* ---------- ชิปหมวดหมู่ (category-filter) ---------- */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+.chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-invert);
+}
+
+/* ---------- เปลี่ยนหน้า (pagination) ---------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.pagination--hidden {
+  display: none;
+}
+
+.pagination__btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.pagination__btn:hover:not([disabled]) {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+.pagination__btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagination__status {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---------- dropdown เรียงลำดับ ---------- */
+.controls__sort {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+}

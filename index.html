@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="description" content="AreaScan Tourism Platform — สำรวจพื้นที่ ค้นหาแหล่งท่องเที่ยว" />
+  <title>AreaScan — Tourism Platform</title>
+
+  <!-- Google Fonts (Noto Sans Thai) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Google Maps API -->
+  <script>window._mapsReady = new Promise(function(r) { window._mapsInitialized = r; });</script>
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8zXjst8EUDWYz9am9bbZ5BRP-Mtlcs6Y&callback=_mapsInitialized"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles/main.css" />
+
+  <!-- PWA / theme -->
+  <meta name="theme-color" content="#0d9488" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+</head>
+<body>
+  <!-- =========================================================
+    App root — ทุก component จะ mount ที่นี่
+    ไม่มี HTML ตายตัวใน body เพราะเป็น SPA ล้วน
+  ========================================================= -->
+  <div id="app">
+    <!-- loading splash ก่อน JS โหลดเสร็จ -->
+    <div style="
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      background:linear-gradient(135deg,#0d9488,#065f46);
+      color:white;
+      font-family:'Noto Sans Thai',sans-serif;
+    ">
+      <div style="font-size:56px">📡</div>
+      <div style="font-size:24px;font-weight:800">AreaScan</div>
+      <div style="font-size:14px;opacity:0.75">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <!-- App entry point (ES module) -->
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>

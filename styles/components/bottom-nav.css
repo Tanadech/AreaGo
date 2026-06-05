@@ -1,0 +1,58 @@
+/**
+ * bottom-nav.css — แถบนำทางด้านล่าง (mobile)
+ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 64px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.06);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  padding: 8px 4px;
+  color: var(--color-text-muted);
+  transition: color 0.15s;
+  font-size: var(--text-xs);
+}
+
+.bottom-nav__item--active {
+  color: var(--color-primary);
+}
+
+.bottom-nav__icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* FAB (ปุ่มสแกนกลาง) */
+.bottom-nav__item--fab .bottom-nav__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font-size: 24px;
+  margin-top: -20px;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45);
+  color: white;
+}
+
+.bottom-nav__item--fab.bottom-nav__item--active .bottom-nav__icon {
+  background: var(--color-primary-dark);
+}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\WIN11\\\\Desktop\\\\work 2\\\\01 APP\" -Recurse)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(find \"/mnt/c/Users/WIN11/Desktop/work 2/01 APP\" -type f -o -type d | sort)",
+      "Read(//mnt/c/Users/WIN11/Desktop/work 2/**)",
+      "Bash(node deploy.js)",
+      "Bash(ls \"c:\\\\Users\\\\WIN11\\\\Desktop\\\\work 2\\\\01 APP\\\\\" 2>&1)",
+      "Read(//c/Users/WIN11/Desktop/work 2/**)",
+      "PowerShell(Rename-Item \"C:\\\\Users\\\\WIN11\\\\Desktop\\\\work 2\\\\01 APP\\\\token.txt.txt\" \"token.txt\")"
+    ]
+  }
+}

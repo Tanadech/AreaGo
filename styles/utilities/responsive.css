@@ -1,0 +1,22 @@
+/**
+ * responsive.css — breakpoints สำหรับ desktop view
+ */
+
+@media (min-width: 768px) {
+  .app--traveler { max-width: 480px; }
+  .stat-grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .trip-layout { flex-direction: row; }
+  .trip-layout__pick { flex: 1; }
+  .trip-layout__plan { flex: 1; }
+}
+
+@media (min-width: 1024px) {
+  .stat-grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .promo-plans { flex-direction: row; }
+  .promo-plan { flex: 1; }
+}
+
+@media (max-width: 480px) {
+  .home-menu { grid-template-columns: repeat(4, 1fr); }
+  .place-detail__stats { grid-template-columns: 1fr; }
+}

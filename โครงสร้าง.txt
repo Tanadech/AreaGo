@@ -1,0 +1,48 @@
+01 APP/
+├── index.html                    ← Entry point (Leaflet CDN + module)
+├── data/
+│   ├── areas.json                ← 4 จังหวัด
+│   ├── places.json               ← 12 สถานที่ + พิกัด GPS
+│   ├── categories.json           ← 6 หมวดหมู่
+│   └── mock-stats.json           ← สถิติ platform, merchant, admin
+├── lib/                          ← Pure logic (DOM-free)
+│   ├── constants.js              ← CONFIG, STORAGE_KEYS, RADIUS_OPTIONS
+│   ├── api.js                    ← fetch layer ทั้งหมด
+│   ├── router.js                 ← Hash-based SPA router
+│   ├── geo.js                    ← Haversine distance, radius check
+│   ├── format.js                 ← rating/distance/price formatter
+│   ├── storage.js                ← localStorage wrapper
+│   ├── dom.js                    ← el(), clear(), debounce()
+│   ├── icons.js                  ← SVG icons
+│   └── validator.js              ← normalizeQuery, truncate
+├── components/                   ← Reusable UI (1 file = 1 component)
+│   ├── header.js / search-box.js
+│   ├── sidebar.js / bottom-nav.js
+│   ├── stat-card.js / loading.js / toast.js
+│   ├── place-card.js / place-grid.js / place-detail.js
+│   ├── category-filter.js / pagination.js
+│   ├── modal.js / map-view.js
+│   └── polygon-scanner.js        ← Wizard 3 ขั้นตอน
+├── pages/
+│   ├── traveler/
+│   │   ├── home.js               ← Stats, Quick Menu, Alerts
+│   │   ├── map-page.js           ← Leaflet Map + filter chips
+│   │   ├── scan-page.js          ← GPS radius + Polygon mode
+│   │   └── trip-page.js          ← Day Trip itinerary builder
+│   ├── merchant/
+│   │   ├── dashboard.js          ← Stats, Merchant types, Promo
+│   │   └── store-form.js         ← 3-step wizard form
+│   └── admin/
+│       ├── dashboard.js          ← Platform overview + rankings
+│       ├── manage-stores.js      ← อนุมัติ/ปฏิเสธร้านค้า
+│       └── reports.js            ← Bar chart, top lists, revenue
+├── scripts/
+│   ├── app.js                    ← Bootstrap + SPA router controller
+│   ├── area-service.js           ← scanArea() ด้วย Haversine
+│   └── place-service.js          ← queryPlaces() filter+sort+paginate
+└── styles/
+    ├── main.css                  ← @import ทุก layer
+    ├── base/ (reset, colors, typography, layout)
+    ├── components/ (header, sidebar, cards, modal, map, toast…)
+    ├── pages/ (traveler, merchant, admin)
+    └── utilities/ (animation, responsive, spacing+btn)

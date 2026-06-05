@@ -1,0 +1,8 @@
+[
+  { "id": "beach",     "name": "ชายหาด",   "icon": "🏖️", "color": "#0ea5e9" },
+  { "id": "mountain",  "name": "ภูเขา/ดอย", "icon": "⛰️", "color": "#16a34a" },
+  { "id": "temple",    "name": "วัด/ศาสนสถาน", "icon": "🛕", "color": "#d97706" },
+  { "id": "food",      "name": "ร้านอาหาร", "icon": "🍜", "color": "#dc2626" },
+  { "id": "market",    "name": "ตลาด",      "icon": "🛍️", "color": "#9333ea" },
+  { "id": "viewpoint", "name": "จุดชมวิว",  "icon": "🌅", "color": "#ea580c" }
+]

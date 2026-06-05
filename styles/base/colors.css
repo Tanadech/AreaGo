@@ -1,0 +1,39 @@
+/**
+ * colors.css — Theme tokens
+ * สีและตัวแปรดีไซน์ทั้งหมดอยู่ที่นี่ที่เดียว (design tokens)
+ * เปลี่ยนธีมทั้งเว็บได้โดยแก้ไฟล์นี้ไฟล์เดียว — ห้าม hardcode สีในไฟล์อื่น (กฎข้อ 3, 5)
+ */
+
+:root {
+  /* แบรนด์ (โทนทะเล/ท่องเที่ยว) */
+  --color-primary: #0d9488;
+  --color-primary-dark: #0f766e;
+  --color-primary-soft: #ccfbf1;
+  --color-accent: #f97316;
+
+  /* พื้นหลัง & พื้นผิว */
+  --color-bg: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafc;
+
+  /* ข้อความ */
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-invert: #ffffff;
+
+  /* เส้นขอบ & สถานะ */
+  --color-border: #e2e8f0;
+  --color-favorite: #ef4444;
+  --color-star: #f59e0b;
+
+  /* เงา */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.16);
+
+  /* มุมโค้ง */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+}

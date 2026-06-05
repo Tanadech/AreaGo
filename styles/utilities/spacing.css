@@ -1,0 +1,137 @@
+/**
+ * spacing.css — utility classes ระยะห่าง + button base variants
+ */
+
+/* Button base (ใช้ร่วมกับ modifier ใน button.css) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  transition: all 0.15s;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+.btn--primary:hover { background: var(--color-primary-dark); }
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.btn--outline:hover { border-color: var(--color-primary); color: var(--color-primary-dark); }
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary);
+}
+
+.btn--sm   { padding: 6px 12px; font-size: var(--text-xs); }
+.btn--full { width: 100%; }
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Wizard step indicators (shared) */
+.wizard-steps, .scanner-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 12px 0;
+}
+
+.wizard-step, .scanner-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+
+.wizard-step__num, .scanner-step__num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.wizard-step--active .wizard-step__num,
+.scanner-step--active .scanner-step__num {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.wizard-step--done .wizard-step__num,
+.scanner-step--done .scanner-step__num {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.wizard-step__label, .scanner-step__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.wizard-step--active .wizard-step__label,
+.scanner-step--active .scanner-step__label { color: var(--color-primary); font-weight: 600; }
+
+.wizard-step__line, .scanner-step__line {
+  position: absolute;
+  top: 16px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 2px;
+  background: var(--color-border);
+}
+
+.wizard-step__line--done,
+.scanner-step__line--done { background: var(--color-primary); }
+
+/* Scanner scanning state */
+.scanner-scanning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 16px;
+}
+
+.scanner-scanning__text {
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+}
+
+.scanner-scanning__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--text-sm);
+}
+
+.scanner-hint { font-size: var(--text-sm); color: var(--color-text-muted); text-align: center; }
+.scanner-counter { font-size: var(--text-xs); color: var(--color-primary); font-weight: 600; }
+.scanner-actions { display: flex; gap: 10px; }
+.scanner-btn-scan { flex: 2; }
+.scanner-btn-reset { flex: 1; }

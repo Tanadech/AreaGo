@@ -1,0 +1,42 @@
+[
+  {
+    "id": "phuket",
+    "name": "ภูเก็ต",
+    "nameEn": "Phuket",
+    "region": "ใต้",
+    "lat": 7.8804,
+    "lng": 98.3923,
+    "cover": "assets/images/area-phuket.jpg",
+    "description": "เกาะท่องเที่ยวระดับโลก ชายหาดขาว น้ำทะเลใส และชีวิตยามค่ำคืนคึกคัก"
+  },
+  {
+    "id": "krabi",
+    "name": "กระบี่",
+    "nameEn": "Krabi",
+    "region": "ใต้",
+    "lat": 8.0863,
+    "lng": 98.9063,
+    "cover": "assets/images/area-krabi.jpg",
+    "description": "หน้าผาหินปูน เกาะสวยน้ำใส และจุดปีนผาชื่อดังของเมืองไทย"
+  },
+  {
+    "id": "chiang-mai",
+    "name": "เชียงใหม่",
+    "nameEn": "Chiang Mai",
+    "region": "เหนือ",
+    "lat": 18.7883,
+    "lng": 98.9853,
+    "cover": "assets/images/area-chiang-mai.jpg",
+    "description": "เมืองวัฒนธรรมล้านนา ดอยสูง คาเฟ่ และตลาดกลางคืนสุดคลาสสิก"
+  },
+  {
+    "id": "bangkok",
+    "name": "กรุงเทพมหานคร",
+    "nameEn": "Bangkok",
+    "region": "กลาง",
+    "lat": 13.7563,
+    "lng": 100.5018,
+    "cover": "assets/images/area-bangkok.jpg",
+    "description": "มหานครที่ไม่เคยหลับ วัดเก่าแก่ ตลาด และสตรีทฟู้ดระดับตำนาน"
+  }
+]

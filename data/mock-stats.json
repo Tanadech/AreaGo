@@ -1,0 +1,46 @@
+{
+  "platform": {
+    "totalUsers": 76215,
+    "totalMerchants": 3214,
+    "totalPlaces": 12456,
+    "totalReviews": 18325,
+    "userGrowth": 7.1,
+    "merchantGrowth": 8.7,
+    "placeGrowth": 12.5,
+    "reviewGrowth": 5.3,
+    "pendingMerchants": 14,
+    "pendingReviews": 37,
+    "adRevenue": 284500
+  },
+  "topAreas": [
+    { "name": "กรุงเทพมหานคร", "visits": 28450, "pct": 100 },
+    { "name": "ภูเก็ต",         "visits": 19320, "pct": 68  },
+    { "name": "เชียงใหม่",      "visits": 15860, "pct": 56  },
+    { "name": "กระบี่",         "visits": 11240, "pct": 40  },
+    { "name": "เกาะสมุย",       "visits": 8730,  "pct": 31  }
+  ],
+  "topPlaces": [
+    { "name": "วัดพระแก้ว",      "views": 12840, "category": "วัด"       },
+    { "name": "เยาวราช",         "views": 9320,  "category": "อาหาร"    },
+    { "name": "ดอยสุเทพ",        "views": 8450,  "category": "วัด"       },
+    { "name": "หาดป่าตอง",       "views": 7610,  "category": "ชายหาด"   },
+    { "name": "อ่าวไร่เลย์",     "views": 6480,  "category": "ชายหาด"   }
+  ],
+  "categoryBreakdown": [
+    { "id": "food",      "name": "ร้านอาหาร",       "count": 320, "icon": "🍜" },
+    { "id": "hotel",     "name": "โรงแรม",           "count": 15,  "icon": "🏨" },
+    { "id": "hospital",  "name": "โรงพยาบาล",        "count": 3,   "icon": "🏥" },
+    { "id": "market",    "name": "ตลาด",              "count": 7,   "icon": "🛍️" },
+    { "id": "cafe",      "name": "คาเฟ่",             "count": 45,  "icon": "☕" },
+    { "id": "other",     "name": "อื่น ๆ",            "count": 280, "icon": "📍" }
+  ],
+  "pendingMerchants": 14,
+  "pendingReviews": 37,
+  "adRevenue": 284500,
+  "merchantStats": {
+    "views":    4821,
+    "navigate": 312,
+    "calls":    87,
+    "saved":    156
+  }
+}

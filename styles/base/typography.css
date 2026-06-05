@@ -1,0 +1,27 @@
+/**
+ * typography.css
+ * ฟอนต์และระดับขนาดตัวอักษรพื้นฐาน
+ */
+
+:root {
+  --font-base: 'Noto Sans Thai', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --leading: 1.6;
+}
+
+body {
+  font-family: var(--font-base);
+  font-size: var(--text-md);
+  line-height: var(--leading);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+}
