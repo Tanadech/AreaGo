@@ -21,6 +21,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
@@ -29,6 +31,7 @@ from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.db import dispose_engine, get_engine
 from app.core.logging import configure_logging, get_logger
+from app.core.rate_limit import limiter
 from app.core.redis import close_redis, get_redis_client
 from app.schemas.common import ErrorDetail, ErrorEnvelope
 
@@ -131,6 +134,17 @@ def _register_exception_handlers(app: FastAPI) -> None:
             details={"errors": jsonable_encoder(exc.errors())},
         )
 
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(
+        request: Request, exc: RateLimitExceeded
+    ) -> JSONResponse:
+        return _envelope_response(
+            status_code=429,
+            code="rate_limited",
+            message="Too many requests. Please slow down.",
+            details={"limit": str(exc.detail)},
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(
         request: Request, exc: Exception
@@ -158,6 +172,11 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
         lifespan=lifespan,
     )
+
+    # Rate limiting (slowapi). Register the shared limiter on app.state, add its
+    # middleware (emits X-RateLimit-* headers), and wire the 429 handler.
+    app.state.limiter = limiter
+    app.add_middleware(SlowAPIMiddleware)
 
     # CORS — explicit allowlist from settings.
     app.add_middleware(

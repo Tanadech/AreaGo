@@ -53,8 +53,8 @@ class Review(Base):
         server_default=func.now(), nullable=False
     )
 
-    place: Mapped["Place"] = relationship(back_populates="reviews")  # noqa: F821
-    user: Mapped["User"] = relationship(back_populates="reviews")  # noqa: F821
+    place: Mapped[Place] = relationship(back_populates="reviews")  # noqa: F821
+    user: Mapped[User] = relationship(back_populates="reviews")  # noqa: F821
 
 
 class Favorite(Base):
@@ -76,8 +76,8 @@ class Favorite(Base):
         server_default=func.now(), nullable=False
     )
 
-    user: Mapped["User"] = relationship(back_populates="favorites")  # noqa: F821
-    place: Mapped["Place"] = relationship(back_populates="favorites")  # noqa: F821
+    user: Mapped[User] = relationship(back_populates="favorites")  # noqa: F821
+    place: Mapped[Place] = relationship(back_populates="favorites")  # noqa: F821
 
 
 __all__ = ["Review", "Favorite"]

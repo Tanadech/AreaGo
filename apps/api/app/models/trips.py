@@ -69,8 +69,8 @@ class Trip(Base):
         server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    user: Mapped["User"] = relationship(back_populates="trips")  # noqa: F821
-    province: Mapped["Province | None"] = relationship(  # noqa: F821
+    user: Mapped[User] = relationship(back_populates="trips")  # noqa: F821
+    province: Mapped[Province | None] = relationship(  # noqa: F821
         back_populates="trips"
     )
     items: Mapped[list[TripItem]] = relationship(
@@ -111,7 +111,7 @@ class TripItem(Base):
     note: Mapped[str | None] = mapped_column(Text)
 
     trip: Mapped[Trip] = relationship(back_populates="items")
-    place: Mapped["Place | None"] = relationship()  # noqa: F821
+    place: Mapped[Place | None] = relationship()  # noqa: F821
 
 
 __all__ = ["Trip", "TripItem"]

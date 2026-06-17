@@ -71,16 +71,16 @@ class User(Base):
     refresh_tokens: Mapped[list[RefreshToken]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    trips: Mapped[list["Trip"]] = relationship(  # noqa: F821
+    trips: Mapped[list[Trip]] = relationship(  # noqa: F821
         back_populates="user", cascade="all, delete-orphan"
     )
-    reviews: Mapped[list["Review"]] = relationship(  # noqa: F821
+    reviews: Mapped[list[Review]] = relationship(  # noqa: F821
         back_populates="user", cascade="all, delete-orphan"
     )
-    favorites: Mapped[list["Favorite"]] = relationship(  # noqa: F821
+    favorites: Mapped[list[Favorite]] = relationship(  # noqa: F821
         back_populates="user", cascade="all, delete-orphan"
     )
-    owned_places: Mapped[list["Place"]] = relationship(  # noqa: F821
+    owned_places: Mapped[list[Place]] = relationship(  # noqa: F821
         back_populates="owner"
     )
 
@@ -121,7 +121,9 @@ class RefreshToken(Base):
         nullable=False,
         index=True,
     )
-    token_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    token_hash: Mapped[str] = mapped_column(
+        Text, nullable=False, unique=True, index=True
+    )
     expires_at: Mapped[dt.datetime] = mapped_column(nullable=False)
     revoked_at: Mapped[dt.datetime | None] = mapped_column()
     replaced_by: Mapped[uuid.UUID | None] = mapped_column(

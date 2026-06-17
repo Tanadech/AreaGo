@@ -28,8 +28,8 @@ class Province(Base):
     districts: Mapped[list[District]] = relationship(
         back_populates="province", cascade="all, delete-orphan"
     )
-    places: Mapped[list["Place"]] = relationship(back_populates="province")  # noqa: F821
-    trips: Mapped[list["Trip"]] = relationship(back_populates="province")  # noqa: F821
+    places: Mapped[list[Place]] = relationship(back_populates="province")  # noqa: F821
+    trips: Mapped[list[Trip]] = relationship(back_populates="province")  # noqa: F821
 
 
 class District(Base):
@@ -55,7 +55,7 @@ class District(Base):
     )
 
     province: Mapped[Province] = relationship(back_populates="districts")
-    places: Mapped[list["Place"]] = relationship(back_populates="district")  # noqa: F821
+    places: Mapped[list[Place]] = relationship(back_populates="district")  # noqa: F821
 
 
 __all__ = ["Province", "District"]

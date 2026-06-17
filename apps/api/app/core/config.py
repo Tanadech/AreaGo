@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_TTL_MIN: int = 15
     REFRESH_TOKEN_TTL_DAYS: int = 7
 
+    # Refresh-token cookie. Defaults are dev-safe (no Secure flag, host-only).
+    # In production set COOKIE_SECURE=true and (optionally) COOKIE_DOMAIN.
+    REFRESH_COOKIE_NAME: str = "refresh_token"
+    COOKIE_SECURE: bool = False
+    COOKIE_DOMAIN: str | None = None
+
     # CORS — comma-separated string in env, parsed to a list.
     # NoDecode disables pydantic-settings' source-level JSON decoding so the
     # validator below receives the raw string (a bare comma list is not JSON).

@@ -41,7 +41,7 @@ class PlaceCategory(Base):
         SmallInteger, server_default=text("0")
     )
 
-    places: Mapped[list["Place"]] = relationship(back_populates="category")
+    places: Mapped[list[Place]] = relationship(back_populates="category")
 
 
 class Place(Base):
@@ -113,13 +113,13 @@ class Place(Base):
     )
 
     category: Mapped[PlaceCategory | None] = relationship(back_populates="places")
-    province: Mapped["Province | None"] = relationship(  # noqa: F821
+    province: Mapped[Province | None] = relationship(  # noqa: F821
         back_populates="places"
     )
-    district: Mapped["District | None"] = relationship(  # noqa: F821
+    district: Mapped[District | None] = relationship(  # noqa: F821
         back_populates="places"
     )
-    owner: Mapped["User | None"] = relationship(  # noqa: F821
+    owner: Mapped[User | None] = relationship(  # noqa: F821
         back_populates="owned_places"
     )
 
@@ -135,10 +135,10 @@ class Place(Base):
     place_tags: Mapped[list[PlaceTag]] = relationship(
         back_populates="place", cascade="all, delete-orphan"
     )
-    reviews: Mapped[list["Review"]] = relationship(  # noqa: F821
+    reviews: Mapped[list[Review]] = relationship(  # noqa: F821
         back_populates="place", cascade="all, delete-orphan"
     )
-    favorites: Mapped[list["Favorite"]] = relationship(  # noqa: F821
+    favorites: Mapped[list[Favorite]] = relationship(  # noqa: F821
         back_populates="place", cascade="all, delete-orphan"
     )
 
