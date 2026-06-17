@@ -2,25 +2,248 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * ============================================================================
+ * AreaScan Design Tokens
+ * ----------------------------------------------------------------------------
+ * All values are exposed as CSS custom properties so they can be themed at
+ * runtime (light/dark) and consumed by Tailwind via `theme.extend`.
+ *
+ * Color channels are stored WITHOUT the rgb() wrapper (e.g. "13 148 136") so
+ * Tailwind's `<alpha-value>` placeholder works: a utility such as
+ * `bg-primary-600/50` compiles to `rgb(13 148 136 / 0.5)`.
+ *
+ * PRIMARY is a teal scale anchored on the AreaScan brand color #0d9488 (600).
+ * ============================================================================
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  /* --- Primary: teal (brand) -------------------------------------------- */
+  --color-primary-50: 240 253 250;
+  --color-primary-100: 204 251 241;
+  --color-primary-200: 153 246 228;
+  --color-primary-300: 94 234 212;
+  --color-primary-400: 45 212 191;
+  --color-primary-500: 20 184 166;
+  --color-primary-600: 13 148 136; /* #0d9488 — AreaScan brand */
+  --color-primary-700: 15 118 110;
+  --color-primary-800: 17 94 89;
+  --color-primary-900: 19 78 74;
+  --color-primary-950: 4 47 46;
+
+  /* --- Neutral: slate-ish gray ------------------------------------------ */
+  --color-neutral-50: 248 250 252;
+  --color-neutral-100: 241 245 249;
+  --color-neutral-200: 226 232 240;
+  --color-neutral-300: 203 213 225;
+  --color-neutral-400: 148 163 184;
+  --color-neutral-500: 100 116 139;
+  --color-neutral-600: 71 85 105;
+  --color-neutral-700: 51 65 85;
+  --color-neutral-800: 30 41 59;
+  --color-neutral-900: 15 23 42;
+  --color-neutral-950: 2 6 23;
+
+  /* --- Accent: warm amber (tourism warmth) ------------------------------ */
+  --color-accent-50: 255 251 235;
+  --color-accent-100: 254 243 199;
+  --color-accent-200: 253 230 138;
+  --color-accent-300: 252 211 77;
+  --color-accent-400: 251 191 36;
+  --color-accent-500: 245 158 11; /* amber-500 — warm accent */
+  --color-accent-600: 217 119 6;
+  --color-accent-700: 180 83 9;
+  --color-accent-800: 146 64 14;
+  --color-accent-900: 120 53 15;
+  --color-accent-950: 69 26 3;
+
+  /* --- Semantic palettes ------------------------------------------------ */
+  --color-success-50: 240 253 244;
+  --color-success-100: 220 252 231;
+  --color-success-500: 34 197 94;
+  --color-success-600: 22 163 74;
+  --color-success-700: 21 128 61;
+
+  --color-warning-50: 255 251 235;
+  --color-warning-100: 254 243 199;
+  --color-warning-500: 245 158 11;
+  --color-warning-600: 217 119 6;
+  --color-warning-700: 180 83 9;
+
+  --color-danger-50: 254 242 242;
+  --color-danger-100: 254 226 226;
+  --color-danger-500: 239 68 68;
+  --color-danger-600: 220 38 38;
+  --color-danger-700: 185 28 28;
+
+  --color-info-50: 239 246 255;
+  --color-info-100: 219 234 254;
+  --color-info-500: 59 130 246;
+  --color-info-600: 37 99 235;
+  --color-info-700: 29 78 216;
+
+  /* --- Semantic surface / text roles (light theme) ---------------------- */
+  --background: 255 255 255;
+  --foreground: 15 23 42; /* neutral-900 */
+
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+
+  --muted: 241 245 249; /* neutral-100 */
+  --muted-foreground: 100 116 139; /* neutral-500 */
+
+  --border: 226 232 240; /* neutral-200 */
+  --input: 226 232 240;
+  --ring: 13 148 136; /* primary-600 */
+
+  /* Role colors map to the brand/semantic scales (with paired foregrounds). */
+  --primary: 13 148 136;
+  --primary-foreground: 255 255 255;
+
+  --accent: 245 158 11;
+  --accent-foreground: 69 26 3;
+
+  --success: 22 163 74;
+  --success-foreground: 255 255 255;
+
+  --warning: 217 119 6;
+  --warning-foreground: 69 26 3;
+
+  --danger: 220 38 38;
+  --danger-foreground: 255 255 255;
+
+  --info: 37 99 235;
+  --info-foreground: 255 255 255;
+
+  /* --- Radius ----------------------------------------------------------- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-card: 0.875rem;
+
+  /* --- Shadows ---------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgb(15 23 42 / 0.1), 0 4px 6px -4px rgb(15 23 42 / 0.05);
+  --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.06);
+  --shadow-focus: 0 0 0 3px rgb(13 148 136 / 0.35);
 }
 
+.dark {
+  /* --- Semantic surface / text roles (dark theme) ----------------------- */
+  --background: 2 6 23; /* neutral-950 */
+  --foreground: 241 245 249; /* neutral-100 */
+
+  --card: 15 23 42; /* neutral-900 */
+  --card-foreground: 241 245 249;
+
+  --popover: 15 23 42;
+  --popover-foreground: 241 245 249;
+
+  --muted: 30 41 59; /* neutral-800 */
+  --muted-foreground: 148 163 184; /* neutral-400 */
+
+  --border: 51 65 85; /* neutral-700 */
+  --input: 51 65 85;
+  --ring: 45 212 191; /* primary-400 — brighter ring on dark */
+
+  --primary: 20 184 166; /* primary-500 reads better on dark */
+  --primary-foreground: 4 47 46;
+
+  --accent: 251 191 36; /* accent-400 */
+  --accent-foreground: 69 26 3;
+
+  --success: 34 197 94;
+  --success-foreground: 4 47 46;
+
+  --warning: 245 158 11;
+  --warning-foreground: 69 26 3;
+
+  --danger: 239 68 68;
+  --danger-foreground: 2 6 23;
+
+  --info: 59 130 246;
+  --info-foreground: 2 6 23;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.55), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-focus: 0 0 0 3px rgb(45 212 191 / 0.4);
+}
+
+/*
+ * Honor OS preference when no explicit `.dark` class is set, so SSR'd pages
+ * respect the user's system theme out of the box. The `.dark` class (toggled
+ * by JS) still wins because it is more specific via the selector below.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    --background: 2 6 23;
+    --foreground: 241 245 249;
+
+    --card: 15 23 42;
+    --card-foreground: 241 245 249;
+
+    --popover: 15 23 42;
+    --popover-foreground: 241 245 249;
+
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
+
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 45 212 191;
+
+    --primary: 20 184 166;
+    --primary-foreground: 4 47 46;
+
+    --accent: 251 191 36;
+    --accent-foreground: 69 26 3;
+
+    --success: 34 197 94;
+    --success-foreground: 4 47 46;
+
+    --warning: 245 158 11;
+    --warning-foreground: 69 26 3;
+
+    --danger: 239 68 68;
+    --danger-foreground: 2 6 23;
+
+    --info: 59 130 246;
+    --info-foreground: 2 6 23;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --shadow-md:
+      0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 0.55), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-focus: 0 0 0 3px rgb(45 212 191 / 0.4);
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+@layer base {
+  * {
+    border-color: rgb(var(--border));
+  }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body {
+    color: rgb(var(--foreground));
+    background: rgb(var(--background));
+  }
 }
