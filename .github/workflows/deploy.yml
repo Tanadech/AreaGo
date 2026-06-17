@@ -1,0 +1,110 @@
+name: Deploy
+
+# SKELETON deploy pipeline.
+# Authenticates to GCP via Workload Identity Federation (no long-lived keys),
+# builds + pushes both service images to Artifact Registry, then deploys to
+# Cloud Run. The prod environment is gated behind a manual approval via the
+# GitHub "production" Environment.
+#
+# >>> TODO before this works <<<
+#   - Replace GCP_PROJECT_ID_* with real project IDs.
+#   - Replace WIF_PROVIDER / WIF_SERVICE_ACCOUNT with your Workload Identity
+#     Federation provider resource name and the deployer service account email.
+#   - Create the Artifact Registry repo "areascan" in each project/region.
+#   - Configure GitHub Environments named: dev, uat, production
+#     (add required reviewers on "production" for the manual approval gate).
+
+on:
+  push:
+    branches: [main]          # auto-deploy dev on merge to main
+    tags: ["v*"]              # tags drive uat/prod promotion
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        type: choice
+        options: [dev, uat, prod]
+        default: dev
+
+permissions:
+  contents: read
+  id-token: write             # required for Workload Identity Federation
+
+env:
+  REGION: asia-southeast1
+  REPO: areascan              # Artifact Registry repository id
+
+jobs:
+  deploy:
+    name: Build & deploy (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: [dev, uat, prod]
+
+    # Maps each matrix env to a GitHub Environment. "prod" -> "production",
+    # which carries the manual approval gate (required reviewers).
+    environment: ${{ matrix.environment == 'prod' && 'production' || matrix.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --- Per-environment config (TODO: fill in real values) ---------------
+      - name: Resolve environment config
+        id: cfg
+        run: |
+          case "${{ matrix.environment }}" in
+            dev)  echo "project_id=TODO_GCP_PROJECT_ID_DEV"  >> "$GITHUB_OUTPUT" ;;
+            uat)  echo "project_id=TODO_GCP_PROJECT_ID_UAT"  >> "$GITHUB_OUTPUT" ;;
+            prod) echo "project_id=TODO_GCP_PROJECT_ID_PROD" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          # TODO: e.g. projects/123456789/locations/global/workloadIdentityPools/gh/providers/gh-provider
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          # TODO: e.g. github-deployer@<project>.iam.gserviceaccount.com
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Build & push images
+        env:
+          PROJECT_ID: ${{ steps.cfg.outputs.project_id }}
+        run: |
+          IMAGE_BASE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}"
+          TAG="${GITHUB_SHA::12}"
+
+          docker build -t "${IMAGE_BASE}/api:${TAG}" -t "${IMAGE_BASE}/api:latest" ./apps/api
+          docker build -t "${IMAGE_BASE}/web:${TAG}" -t "${IMAGE_BASE}/web:latest" ./apps/web
+
+          docker push "${IMAGE_BASE}/api:${TAG}"
+          docker push "${IMAGE_BASE}/api:latest"
+          docker push "${IMAGE_BASE}/web:${TAG}"
+          docker push "${IMAGE_BASE}/web:latest"
+
+      - name: Deploy API to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: areascan-api
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ steps.cfg.outputs.project_id }}/${{ env.REPO }}/api:latest
+          # TODO: wire env vars / secrets, e.g.:
+          #   flags: --port=8000
+          #   secrets: JWT_SECRET=JWT_SECRET:latest,ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest
+
+      - name: Deploy Web to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: areascan-web
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ steps.cfg.outputs.project_id }}/${{ env.REPO }}/web:latest
+          # TODO: set NEXT_PUBLIC_* build/runtime vars to the deployed API URL.
+          #   flags: --port=3000

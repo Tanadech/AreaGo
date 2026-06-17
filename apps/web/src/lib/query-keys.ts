@@ -1,0 +1,25 @@
+/**
+ * Centralized React Query key factory.
+ *
+ * Keeping every query key in one place avoids typos and makes targeted
+ * invalidation (`queryClient.invalidateQueries({ queryKey: queryKeys.X })`)
+ * predictable across the app. Each entry returns a readonly tuple.
+ */
+export const queryKeys = {
+  health: () => ["health"] as const,
+
+  auth: {
+    all: () => ["auth"] as const,
+    me: () => [...queryKeys.auth.all(), "me"] as const,
+  },
+
+  // Example domain placeholders — expand per feature in later phases.
+  areas: {
+    all: () => ["areas"] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.areas.all(), "list", params ?? {}] as const,
+    detail: (id: string) => [...queryKeys.areas.all(), "detail", id] as const,
+  },
+} as const;
+
+export type QueryKeys = typeof queryKeys;

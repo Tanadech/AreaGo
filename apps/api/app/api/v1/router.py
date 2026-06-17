@@ -1,0 +1,12 @@
+"""Aggregates all v1 sub-routers under a single APIRouter."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter
+
+from app.api.v1 import health
+
+api_router = APIRouter()
+
+# Sub-routers. Add new feature routers here as they are implemented.
+api_router.include_router(health.router)

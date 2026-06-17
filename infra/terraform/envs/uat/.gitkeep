@@ -1,0 +1,2 @@
+# Placeholder for the UAT environment root module.
+# Mirror envs/dev/main.tf here when UAT is provisioned.

@@ -1,3 +1,37 @@
-token.txt
+# --- Node / Next.js (apps/web) ---
 node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+
+# --- Python (apps/api) ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- Environment / secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- Terraform ---
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+!*.tfvars.example
+
+# --- Misc / OS ---
+.DS_Store
+*.log
+
+# --- Project-specific (legacy prototype artifacts) ---
+token.txt
 deploy.js
