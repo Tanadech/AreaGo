@@ -1,93 +1,169 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getHealth, ApiError } from "@/lib/api-client";
+import { useCallback, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AuthControl } from "@/components/auth/auth-control";
+import { LoginDialog } from "@/components/auth/login-dialog";
+import {
+  ApiError,
+  listPlaces,
+  savePlace,
+  type Place,
+} from "@/lib/api-client";
+import type { MapsLibraries } from "@/lib/maps";
 import { queryKeys } from "@/lib/query-keys";
+import {
+  DEFAULT_CENTER,
+  MapCanvas,
+} from "@/features/map/MapCanvas";
+import { PlaceDetailCard } from "@/features/map/PlaceDetailCard";
+import { SearchBox } from "@/features/map/SearchBox";
+import type { SelectedGooglePlace } from "@/features/map/types";
 
-function StatusPill({ value }: { value: string }) {
-  const ok = value === "ok";
-  return (
-    <span
-      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-        ok ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-      }`}
-    >
-      {value}
-    </span>
-  );
-}
+const EMPTY_PLACES: Place[] = [];
 
 export default function HomePage() {
-  const { data, error, isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: queryKeys.health(),
-    queryFn: getHealth,
+  const queryClient = useQueryClient();
+
+  // Loaded Maps libraries + map instance (set once MapCanvas is ready).
+  const [placesLib, setPlacesLib] = useState<google.maps.PlacesLibrary | null>(
+    null,
+  );
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  // Selected Google place (search result) shown in the detail card + marker.
+  const [selected, setSelected] = useState<SelectedGooglePlace | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  // Login dialog state. `pendingSave` is the place to re-save after login.
+  const [loginOpen, setLoginOpen] = useState(false);
+  const pendingSaveRef = useRef<SelectedGooglePlace | null>(null);
+
+  // Saved DB places -> markers (requirement 3).
+  const placesQuery = useQuery({
+    queryKey: queryKeys.places.list(),
+    queryFn: () => listPlaces(),
+  });
+  const savedPlaces = placesQuery.data?.items ?? EMPTY_PLACES;
+
+  const handleMapReady = useCallback(
+    (libraries: MapsLibraries, map: google.maps.Map) => {
+      setPlacesLib(libraries.places);
+      mapRef.current = map;
+    },
+    [],
+  );
+
+  const saveMutation = useMutation({
+    mutationFn: (place: SelectedGooglePlace) =>
+      savePlace({
+        name: place.name,
+        lat: place.lat,
+        lng: place.lng,
+        address: place.address ?? undefined,
+        google_place_id: place.googlePlaceId,
+      }),
+    onSuccess: () => {
+      setSaved(true);
+      pendingSaveRef.current = null;
+      // Refresh saved-place markers.
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.places.all(),
+      });
+    },
+    onError: (error: unknown) => {
+      // 401 -> not logged in: stash the place and open the login dialog so the
+      // save can be retried after authentication (requirement 5).
+      if (error instanceof ApiError && error.status === 401) {
+        pendingSaveRef.current = selected;
+        setLoginOpen(true);
+      }
+    },
   });
 
+  const handleSelect = useCallback((place: SelectedGooglePlace) => {
+    setSelected(place);
+    setSaved(false);
+    saveMutation.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (selected) saveMutation.mutate(selected);
+  }, [selected, saveMutation]);
+
+  const handleLoginSuccess = useCallback(() => {
+    const pending = pendingSaveRef.current;
+    if (pending) {
+      saveMutation.mutate(pending);
+    }
+  }, [saveMutation]);
+
+  // Surface non-401 save errors inline on the card.
+  const saveError =
+    saveMutation.error instanceof ApiError && saveMutation.error.status !== 401
+      ? saveMutation.error.message
+      : saveMutation.error && !(saveMutation.error instanceof ApiError)
+        ? "บันทึกไม่สำเร็จ กรุณาลองใหม่"
+        : null;
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-8 px-6 py-16">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">AreaScan</h1>
-        <p className="text-sm text-gray-500">
-          แพลตฟอร์มท่องเที่ยว — สถานะการเชื่อมต่อกับ API
-        </p>
-        <code className="text-xs text-gray-400">
-          {process.env.NEXT_PUBLIC_API_BASE_URL ??
-            "http://localhost:8000/api/v1"}
-          /health
-        </code>
+    <div className="flex min-h-screen flex-col">
+      <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3 sm:px-6">
+        <div className="flex flex-col">
+          <h1 className="text-xl font-bold tracking-tight">AreaScan</h1>
+          <p className="text-xs text-muted-foreground">
+            ค้นหาและบันทึกสถานที่ท่องเที่ยว
+          </p>
+        </div>
+        <AuthControl onRequestLogin={() => setLoginOpen(true)} />
       </header>
 
-      <section className="rounded-lg border border-gray-200 p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">API Health</h2>
-          <button
-            type="button"
-            onClick={() => void refetch()}
-            disabled={isFetching}
-            className="rounded-md border border-gray-300 px-3 py-1 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-          >
-            {isFetching ? "กำลังโหลด…" : "รีเฟรช"}
-          </button>
+      <main className="relative flex-1">
+        {/* Full-width map (requirement 1). */}
+        <div className="absolute inset-0">
+          <MapCanvas
+            savedPlaces={savedPlaces}
+            selected={selected}
+            selectedSaved={saved}
+            onReady={handleMapReady}
+            onError={setMapError}
+          />
         </div>
 
-        {isLoading && <p className="text-sm text-gray-500">กำลังตรวจสอบ…</p>}
+        {/* Floating search + detail panel (requirements 2 & 4). */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-4">
+          <div className="pointer-events-auto flex w-full max-w-md flex-col gap-3">
+            <div className="rounded-card border border-border bg-card p-3 shadow-card">
+              <SearchBox
+                places={placesLib}
+                unavailable={mapError !== null}
+                locationBias={
+                  mapRef.current?.getCenter()?.toJSON() ?? DEFAULT_CENTER
+                }
+                onResult={handleSelect}
+              />
+            </div>
 
-        {isError && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
-            <p className="font-medium">เชื่อมต่อ API ไม่สำเร็จ</p>
-            <p className="mt-1 font-mono text-xs">
-              {error instanceof ApiError
-                ? `[${error.status}] ${error.code}: ${error.message}`
-                : (error as Error).message}
-            </p>
+            {selected && (
+              <PlaceDetailCard
+                place={selected}
+                onSave={handleSave}
+                saving={saveMutation.isPending}
+                saved={saved}
+                error={saveError}
+              />
+            )}
           </div>
-        )}
+        </div>
+      </main>
 
-        {data && (
-          <div className="flex flex-col gap-3">
-            <dl className="grid grid-cols-2 gap-y-2 text-sm">
-              <dt className="text-gray-500">status</dt>
-              <dd>
-                <StatusPill value={data.status} />
-              </dd>
-              <dt className="text-gray-500">db</dt>
-              <dd>
-                <StatusPill value={data.db} />
-              </dd>
-              <dt className="text-gray-500">redis</dt>
-              <dd>
-                <StatusPill value={data.redis} />
-              </dd>
-              <dt className="text-gray-500">env</dt>
-              <dd className="font-mono text-xs">{data.env}</dd>
-            </dl>
-
-            <pre className="overflow-x-auto rounded-md bg-gray-900 p-4 text-xs text-gray-100">
-              {JSON.stringify(data, null, 2)}
-            </pre>
-          </div>
-        )}
-      </section>
-    </main>
+      <LoginDialog
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSuccess={handleLoginSuccess}
+      />
+    </div>
   );
 }

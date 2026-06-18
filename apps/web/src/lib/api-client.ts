@@ -139,3 +139,123 @@ export interface HealthResponse {
 export function getHealth(): Promise<HealthResponse> {
   return apiFetch<HealthResponse>("/health");
 }
+
+/* -------------------------------------------------------------------------- */
+/* Auth                                                                       */
+/* -------------------------------------------------------------------------- */
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+/** POST /auth/login -> access token (refresh is set as an httpOnly cookie). */
+export interface LoginResponse {
+  access_token: string;
+  token_type: "bearer";
+  expires_in: number;
+}
+
+/** GET /auth/me -> the authenticated user profile + roles. */
+export interface MeResponse {
+  id: string;
+  email: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  roles: string[];
+}
+
+/**
+ * POST /api/v1/auth/login.
+ *
+ * `credentials: "include"` so the server can set the httpOnly refresh cookie
+ * (and send it on a same-site refresh later).
+ */
+export function login(body: LoginRequest): Promise<LoginResponse> {
+  return apiFetch<LoginResponse>("/auth/login", {
+    method: "POST",
+    body,
+    credentials: "include",
+  });
+}
+
+/** GET /api/v1/auth/me (Bearer token injected by the fetch wrapper). */
+export function getMe(): Promise<MeResponse> {
+  return apiFetch<MeResponse>("/auth/me");
+}
+
+/* -------------------------------------------------------------------------- */
+/* Places                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/** A place as returned by the catalog/list endpoints. */
+export interface Place {
+  id: string;
+  name: string;
+  kind?: string | null;
+  category_id?: string | null;
+  category?: string | null;
+  rating_avg?: number | null;
+  rating_count?: number | null;
+  price_level?: number | null;
+  lat: number;
+  lng: number;
+  distance_m?: number | null;
+  address?: string | null;
+  google_place_id?: string | null;
+}
+
+/** Generic paginated envelope used by list endpoints. */
+export interface Page<T> {
+  items: T[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+}
+
+/** Optional filters accepted by GET /api/v1/places. */
+export interface ListPlacesParams {
+  category_id?: string;
+  kind?: string;
+  q?: string;
+  sort?: "rating" | "popular" | "name";
+  page?: number;
+  size?: number;
+}
+
+/** GET /api/v1/places -> a page of places (public read). */
+export function listPlaces(params: ListPlacesParams = {}): Promise<Page<Place>> {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== "") {
+      search.set(key, String(value));
+    }
+  }
+  const qs = search.toString();
+  return apiFetch<Page<Place>>(`/places${qs ? `?${qs}` : ""}`);
+}
+
+/** Body for creating a place (POST /api/v1/places). Bearer required. */
+export interface SavePlaceRequest {
+  name: string;
+  lat: number;
+  lng: number;
+  address?: string;
+  google_place_id?: string;
+  category_id?: string;
+  phone?: string;
+  website?: string;
+  kind?: string;
+}
+
+/**
+ * POST /api/v1/places.
+ *
+ * Requires authentication; throws an {@link ApiError} with `status === 401`
+ * when no/expired token is present so callers can trigger the login flow and
+ * retry.
+ */
+export function savePlace(body: SavePlaceRequest): Promise<Place> {
+  return apiFetch<Place>("/places", { method: "POST", body });
+}

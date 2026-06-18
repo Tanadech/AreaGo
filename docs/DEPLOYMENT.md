@@ -109,11 +109,11 @@ export API_URL=$(gcloud run services describe areascan-api --region=$REGION --fo
 gcloud run deploy areascan-web \
   --image=$REGION-docker.pkg.dev/$PROJECT_ID/areascan/web:<tag> \
   --region=$REGION \
-  --set-env-vars=NEXT_PUBLIC_API_BASE_URL=$API_URL/api/v1,NEXT_PUBLIC_GOOGLE_MAPS_KEY=<maps-browser-key> \
+  --set-env-vars=NEXT_PUBLIC_API_BASE_URL=$API_URL/api/v1,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<maps-browser-key> \
   --min-instances=0 --allow-unauthenticated
 ```
 > **สำคัญ — Cloud SQL connection string ต่างจาก local**: บน Cloud Run ใช้ unix socket `host=/cloudsql/$CONN_NAME` (มาจาก `--add-cloudsql-instances`). docker-compose ฝั่ง local ใช้ `@db:5432`. ทั้งคู่ควบคุมด้วย env `DATABASE_URL` ตัวเดียว.
-> **NEXT_PUBLIC_GOOGLE_MAPS_KEY** เป็น browser key (จำกัด HTTP referrer); **GOOGLE_MAPS_SERVER_KEY** (Places/Directions/Geocoding) อยู่ฝั่ง api เท่านั้น ห้ามหลุดมา client.
+> **NEXT_PUBLIC_GOOGLE_MAPS_API_KEY** เป็น browser key (จำกัด HTTP referrer); **GOOGLE_MAPS_SERVER_KEY** (Places/Directions/Geocoding) อยู่ฝั่ง api เท่านั้น ห้ามหลุดมา client.
 
 ## STEP 7 — CI/CD auth ด้วย Workload Identity Federation (ไม่มี SA key ใน GitHub)
 ```bash

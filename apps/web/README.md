@@ -36,7 +36,7 @@ proves web <-> api connectivity.
 | Variable                     | Description                                         | Example                          |
 | ---------------------------- | --------------------------------------------------- | -------------------------------- |
 | `NEXT_PUBLIC_API_BASE_URL`   | Versioned API base URL (browser-visible)            | `http://localhost:8000/api/v1`   |
-| `NEXT_PUBLIC_GOOGLE_MAPS_KEY`| Google Maps JavaScript API key (browser-restricted) | `AIza...`                        |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`| Google Maps JavaScript API key (browser-restricted) | `AIza...`                    |
 
 > Inside `docker-compose`, API/DB/Redis hosts are service names (`api`, `db`,
 > `redis`). On the host machine they are `localhost`.

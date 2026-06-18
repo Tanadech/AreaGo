@@ -13,6 +13,13 @@ export const queryKeys = {
     me: () => [...queryKeys.auth.all(), "me"] as const,
   },
 
+  places: {
+    all: () => ["places"] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.places.all(), "list", params ?? {}] as const,
+    detail: (id: string) => [...queryKeys.places.all(), "detail", id] as const,
+  },
+
   // Example domain placeholders — expand per feature in later phases.
   areas: {
     all: () => ["areas"] as const,
