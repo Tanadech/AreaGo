@@ -8,7 +8,7 @@ import uuid
 
 from fastapi import APIRouter, HTTPException, Path, Query
 
-from app.deps import SessionDep
+from app.deps import CurrentUser, SessionDep
 from app.repositories.place_repo import PlaceFilters
 from app.schemas.common import Page
 from app.schemas.place import (
@@ -19,6 +19,7 @@ from app.schemas.place import (
     SIZE_DEFAULT,
     SIZE_MAX,
     SIZE_MIN,
+    PlaceCreate,
     PlaceDetail,
     PlaceKind,
     PlaceListItem,
@@ -124,3 +125,20 @@ async def nearby_places(
     if items is None:
         raise HTTPException(status_code=404, detail="Place not found.")
     return items
+
+
+@router.post(
+    "/places",
+    response_model=PlaceDetail,
+    status_code=201,
+    summary="Save a place selected from Google Places (auth required)",
+)
+async def create_place(
+    db: SessionDep, user: CurrentUser, payload: PlaceCreate
+) -> PlaceDetail:
+    """Persist a user-selected Google place into PostgreSQL.
+
+    Idempotent on ``google_place_id`` (saving the same place returns the existing
+    record). Requires authentication; the new place is owned by the caller.
+    """
+    return await place_service.create_place(db, user=user, payload=payload)

@@ -90,6 +90,9 @@ class Place(Base):
     address: Mapped[str | None] = mapped_column(Text)
     phone: Mapped[str | None] = mapped_column(String(40))
     website: Mapped[str | None] = mapped_column(Text)
+    google_place_id: Mapped[str | None] = mapped_column(
+        Text, unique=True, index=True
+    )
     location: Mapped[object] = mapped_column(
         Geography(geometry_type="POINT", srid=4326, spatial_index=False),
         nullable=False,

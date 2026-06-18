@@ -13,11 +13,13 @@ from sqlalchemy import Row
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.catalog import Place
+from app.models.rbac import User
 from app.repositories import place_repo
 from app.repositories.place_repo import PlaceFilters
 from app.schemas.common import Page
 from app.schemas.place import (
     ImageResponse,
+    PlaceCreate,
     PlaceDetail,
     PlaceListItem,
     RestaurantExt,
@@ -151,4 +153,42 @@ async def nearby(
     return [_row_to_list_item(r) for r in rows]
 
 
-__all__ = ["list_places", "search_radius", "get_detail", "nearby"]
+async def create_place(
+    session: AsyncSession, *, user: User, payload: PlaceCreate
+) -> PlaceDetail:
+    """Save a place selected from Google Places into the catalog (status=approved).
+
+    Idempotent on ``google_place_id``: saving the same Google place again returns
+    the existing record instead of creating a duplicate.
+    """
+    if payload.google_place_id:
+        existing = await place_repo.get_by_google_place_id(
+            session, payload.google_place_id
+        )
+        if existing is not None:
+            detail = await get_detail(session, existing.id)
+            if detail is not None:
+                return detail
+
+    place = await place_repo.create_place(
+        session,
+        name=payload.name,
+        lat=payload.lat,
+        lng=payload.lng,
+        address=payload.address,
+        google_place_id=payload.google_place_id,
+        category_id=payload.category_id,
+        phone=payload.phone,
+        website=payload.website,
+        kind=payload.kind.value,
+        owner_id=user.id,
+        status="approved",
+    )
+    await session.commit()
+    detail = await get_detail(session, place.id)
+    if detail is None:  # pragma: no cover - a just-created approved place is visible
+        raise RuntimeError("Saved place could not be retrieved.")
+    return detail
+
+
+__all__ = ["list_places", "search_radius", "get_detail", "nearby", "create_place"]

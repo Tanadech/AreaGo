@@ -12,6 +12,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 
+from geoalchemy2 import WKTElement
 from sqlalchemy import Row, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -260,6 +261,51 @@ async def nearby(
     return list((await session.execute(stmt)).all())
 
 
+async def get_by_google_place_id(
+    session: AsyncSession, google_place_id: str
+) -> Place | None:
+    """Return the place previously saved for this Google place id, if any."""
+    stmt = select(Place).where(Place.google_place_id == google_place_id)
+    return (await session.execute(stmt)).scalar_one_or_none()
+
+
+async def create_place(
+    session: AsyncSession,
+    *,
+    name: str,
+    lat: float,
+    lng: float,
+    address: str | None,
+    google_place_id: str | None,
+    category_id: int | None,
+    phone: str | None,
+    website: str | None,
+    kind: str,
+    owner_id: uuid.UUID,
+    status: str = "approved",
+) -> Place:
+    """Insert a place from Google Places data (flushed). Caller commits.
+
+    The geography point is built from (lng, lat) via WKTElement so PostGIS stores
+    a proper SRID 4326 geography Point.
+    """
+    place = Place(
+        name=name,
+        location=WKTElement(f"POINT({lng} {lat})", srid=4326),
+        address=address,
+        google_place_id=google_place_id,
+        category_id=category_id,
+        phone=phone,
+        website=website,
+        kind=kind,
+        owner_id=owner_id,
+        status=status,
+    )
+    session.add(place)
+    await session.flush()
+    return place
+
+
 __all__ = [
     "PlaceFilters",
     "list_places",
@@ -270,4 +316,6 @@ __all__ = [
     "get_images",
     "place_location",
     "nearby",
+    "get_by_google_place_id",
+    "create_place",
 ]

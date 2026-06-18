@@ -149,6 +149,22 @@ class PlaceDetail(BaseModel):
     images: list[ImageResponse] = Field(default_factory=list)
 
 
+class PlaceCreate(BaseModel):
+    """Persist a place selected from the Google Places API into the catalog."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+    lat: float = Field(..., ge=-90.0, le=90.0, description="Latitude (WGS84).")
+    lng: float = Field(..., ge=-180.0, le=180.0, description="Longitude (WGS84).")
+    address: str | None = None
+    google_place_id: str | None = Field(
+        None, max_length=300, description="Google Places id (used to de-duplicate)."
+    )
+    category_id: int | None = Field(None, ge=1)
+    phone: str | None = Field(None, max_length=40)
+    website: str | None = None
+    kind: PlaceKind = PlaceKind.attraction
+
+
 # ---------------------------------------------------------------------------
 # Validation bounds (also used by the route Query() definitions)
 # ---------------------------------------------------------------------------
@@ -177,6 +193,7 @@ __all__ = [
     "ShopExt",
     "PlaceListItem",
     "PlaceDetail",
+    "PlaceCreate",
     "Latitude",
     "Longitude",
     "RADIUS_M_MIN",
