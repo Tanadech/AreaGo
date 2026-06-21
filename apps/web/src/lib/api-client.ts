@@ -259,3 +259,176 @@ export interface SavePlaceRequest {
 export function savePlace(body: SavePlaceRequest): Promise<Place> {
   return apiFetch<Place>("/places", { method: "POST", body });
 }
+
+/* -------------------------------------------------------------------------- */
+/* Trips (Trip Planner)                                                       */
+/* -------------------------------------------------------------------------- */
+
+/** A single itinerary item within a trip (TripItemResponse). */
+export interface TripItem {
+  id: string;
+  place_id: string;
+  place_name: string;
+  lat: number;
+  lng: number;
+  day_no: number | null;
+  sort_order: number | null;
+  start_time: string | null;
+  duration_min: number | null;
+  est_cost: number | null;
+  note: string | null;
+}
+
+/** A full trip with its ordered itinerary items (TripResponse). */
+export interface Trip {
+  id: string;
+  title: string;
+  province_id: string | null;
+  start_date: string | null;
+  days: number;
+  budget: number | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  items: TripItem[];
+}
+
+/** A trip summary as returned by the list endpoint (TripListItem). */
+export interface TripListItem {
+  id: string;
+  title: string;
+  province_id: string | null;
+  start_date: string | null;
+  days: number;
+  budget: number | null;
+  status: string;
+  item_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Body for creating an itinerary item (TripItemCreate). */
+export interface TripItemCreate {
+  place_id: string;
+  day_no?: number;
+  sort_order?: number;
+  start_time?: string;
+  duration_min?: number;
+  est_cost?: number;
+  note?: string;
+}
+
+/** Body for creating a trip (TripCreate). */
+export interface TripCreate {
+  title: string;
+  province_id?: string;
+  start_date?: string;
+  days: number;
+  budget?: number;
+  items?: TripItemCreate[];
+}
+
+/** Partial update for a trip (TripUpdate). */
+export interface TripUpdate {
+  title?: string;
+  province_id?: string | null;
+  start_date?: string | null;
+  days?: number;
+  budget?: number | null;
+  status?: string;
+}
+
+/** Partial update for an itinerary item (TripItemUpdate). */
+export interface TripItemUpdate {
+  day_no?: number;
+  sort_order?: number;
+  start_time?: string | null;
+  duration_min?: number | null;
+  est_cost?: number | null;
+  note?: string | null;
+}
+
+/** A single reorder entry for PUT /trips/{id}/reorder. */
+export interface TripReorderItem {
+  id: string;
+  day_no: number;
+  sort_order: number;
+}
+
+/**
+ * POST /api/v1/trips — create a trip.
+ *
+ * Auth required; throws {@link ApiError} `status === 401` when unauthenticated
+ * so callers can open the login flow and retry.
+ */
+export function createTrip(body: TripCreate): Promise<Trip> {
+  return apiFetch<Trip>("/trips", { method: "POST", body });
+}
+
+/** GET /api/v1/trips — the caller's trips (auth required). */
+export function listTrips(): Promise<TripListItem[]> {
+  return apiFetch<TripListItem[]>("/trips");
+}
+
+/** GET /api/v1/trips/{trip_id} — one owned trip (auth required, 404 if not). */
+export function getTrip(tripId: string): Promise<Trip> {
+  return apiFetch<Trip>(`/trips/${tripId}`);
+}
+
+/** PATCH /api/v1/trips/{trip_id} — partial trip update (auth required). */
+export function updateTrip(tripId: string, body: TripUpdate): Promise<Trip> {
+  return apiFetch<Trip>(`/trips/${tripId}`, { method: "PATCH", body });
+}
+
+/** DELETE /api/v1/trips/{trip_id} — remove a trip (auth required). */
+export function deleteTrip(tripId: string): Promise<void> {
+  return apiFetch<void>(`/trips/${tripId}`, { method: "DELETE" });
+}
+
+/** POST /api/v1/trips/{trip_id}/items — add an itinerary item (auth required). */
+export function addTripItem(
+  tripId: string,
+  body: TripItemCreate,
+): Promise<Trip> {
+  return apiFetch<Trip>(`/trips/${tripId}/items`, { method: "POST", body });
+}
+
+/**
+ * PATCH /api/v1/trips/{trip_id}/items/{item_id} — update an item (auth
+ * required).
+ */
+export function updateTripItem(
+  tripId: string,
+  itemId: string,
+  body: TripItemUpdate,
+): Promise<Trip> {
+  return apiFetch<Trip>(`/trips/${tripId}/items/${itemId}`, {
+    method: "PATCH",
+    body,
+  });
+}
+
+/**
+ * DELETE /api/v1/trips/{trip_id}/items/{item_id} — remove an item (auth
+ * required).
+ */
+export function removeTripItem(
+  tripId: string,
+  itemId: string,
+): Promise<void> {
+  return apiFetch<void>(`/trips/${tripId}/items/${itemId}`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * PUT /api/v1/trips/{trip_id}/reorder — atomically set day_no + sort_order for
+ * a set of items, returning the re-sorted {@link Trip}. Every id must belong to
+ * the trip (else 404, no partial writes). Auth required.
+ */
+export function reorderTripItems(
+  tripId: string,
+  body: { items: TripReorderItem[] },
+): Promise<Trip> {
+  return apiFetch<Trip>(`/trips/${tripId}/reorder`, { method: "PUT", body });
+}

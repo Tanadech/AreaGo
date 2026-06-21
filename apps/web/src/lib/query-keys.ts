@@ -20,6 +20,12 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.places.all(), "detail", id] as const,
   },
 
+  trips: {
+    all: () => ["trips"] as const,
+    list: () => [...queryKeys.trips.all(), "list"] as const,
+    detail: (id: string) => [...queryKeys.trips.all(), "detail", id] as const,
+  },
+
   // Example domain placeholders — expand per feature in later phases.
   areas: {
     all: () => ["areas"] as const,

@@ -21,6 +21,15 @@ from app.main import app
 
 _TRIP = "/api/v1/trips/00000000-0000-0000-0000-000000000000"
 _PLACE_JSON = {"place_id": "00000000-0000-0000-0000-000000000001"}
+_REORDER_JSON = {
+    "items": [
+        {
+            "id": "00000000-0000-0000-0000-000000000002",
+            "day_no": 1,
+            "sort_order": 0,
+        }
+    ]
+}
 
 
 async def _no_session() -> AsyncIterator[None]:
@@ -47,6 +56,7 @@ def no_db() -> AsyncIterator[None]:
         ("patch", _TRIP, {"title": "Renamed"}),
         ("delete", _TRIP, None),
         ("post", f"{_TRIP}/items", _PLACE_JSON),
+        ("put", f"{_TRIP}/reorder", _REORDER_JSON),
         ("delete", f"{_TRIP}/items/00000000-0000-0000-0000-000000000002", None),
     ],
 )
@@ -75,3 +85,5 @@ async def test_trips_router_is_mounted(client: AsyncClient) -> None:
     assert "/api/v1/trips/{trip_id}" in paths
     assert "/api/v1/trips/{trip_id}/items" in paths
     assert "/api/v1/trips/{trip_id}/items/{item_id}" in paths
+    assert "/api/v1/trips/{trip_id}/reorder" in paths
+    assert "put" in paths["/api/v1/trips/{trip_id}/reorder"]

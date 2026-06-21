@@ -148,6 +148,36 @@ async def get_owned_item(
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
+async def reorder_items(
+    session: AsyncSession,
+    *,
+    trip_id: uuid.UUID,
+    orders: list[tuple[uuid.UUID, int, int]],
+) -> bool:
+    """Bulk-update (day_no, sort_order) for a trip's items in one transaction.
+
+    ``orders`` is a list of ``(item_id, day_no, sort_order)``. Every supplied id
+    must belong to ``trip_id``; if any id is foreign or unknown, no row is
+    mutated and ``False`` is returned (the caller treats this as not-found). On
+    success the items are updated (flushed) and ``True`` is returned; the caller
+    commits.
+    """
+    stmt = select(TripItem).where(TripItem.trip_id == trip_id)
+    items = {item.id: item for item in (await session.execute(stmt)).scalars()}
+
+    supplied = {order[0] for order in orders}
+    if not supplied.issubset(items.keys()):
+        return False
+
+    for item_id, day_no, sort_order in orders:
+        item = items[item_id]
+        item.day_no = day_no
+        item.sort_order = sort_order
+
+    await session.flush()
+    return True
+
+
 async def place_exists(session: AsyncSession, *, place_id: uuid.UUID) -> bool:
     """True if a place with this id exists (FK also enforces it on insert)."""
     stmt = select(func.count()).select_from(Place).where(Place.id == place_id)
@@ -171,6 +201,7 @@ __all__ = [
     "list_for_user",
     "items_with_place",
     "get_owned_item",
+    "reorder_items",
     "place_exists",
     "delete_trip",
     "delete_item",

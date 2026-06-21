@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthControl } from "@/components/auth/auth-control";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import { buttonVariants } from "@/components/ui";
 import {
   ApiError,
   listPlaces,
@@ -117,7 +119,15 @@ export default function HomePage() {
             ค้นหาและบันทึกสถานที่ท่องเที่ยว
           </p>
         </div>
-        <AuthControl onRequestLogin={() => setLoginOpen(true)} />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/trips"
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
+            ทริปของฉัน
+          </Link>
+          <AuthControl onRequestLogin={() => setLoginOpen(true)} />
+        </div>
       </header>
 
       <main className="relative flex-1">

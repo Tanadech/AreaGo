@@ -22,6 +22,7 @@ from app.schemas.trip import (
     TripItemResponse,
     TripItemUpdate,
     TripListItem,
+    TripReorder,
     TripResponse,
     TripUpdate,
 )
@@ -199,6 +200,32 @@ async def update_item(
     return await _build_response(session, trip)
 
 
+async def reorder(
+    session: AsyncSession,
+    *,
+    user: User,
+    trip_id: uuid.UUID,
+    payload: TripReorder,
+) -> TripResponse | None:
+    """Bulk-reposition an owned trip's items in one transaction.
+
+    Returns None (treated as 404) if the trip is not owned, or if any supplied
+    item id does not belong to the trip — in which case nothing is written
+    (all ids are validated before any mutation).
+    """
+    trip = await trip_repo.get_owned(session, user_id=user.id, trip_id=trip_id)
+    if trip is None:
+        return None
+    orders = [(o.id, o.day_no, o.sort_order) for o in payload.items]
+    ok = await trip_repo.reorder_items(session, trip_id=trip.id, orders=orders)
+    if not ok:
+        await session.rollback()
+        return None
+    await session.commit()
+    await session.refresh(trip)
+    return await _build_response(session, trip)
+
+
 async def delete_item(
     session: AsyncSession,
     *,
@@ -225,5 +252,6 @@ __all__ = [
     "delete_trip",
     "add_item",
     "update_item",
+    "reorder",
     "delete_item",
 ]

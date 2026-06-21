@@ -17,6 +17,7 @@ from app.schemas.trip import (
     TripItemCreate,
     TripItemUpdate,
     TripListItem,
+    TripReorder,
     TripResponse,
     TripUpdate,
 )
@@ -137,6 +138,28 @@ async def update_trip_item(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=_ITEM_NOT_FOUND
         )
+    return trip
+
+
+@router.put(
+    "/trips/{trip_id}/reorder",
+    response_model=TripResponse,
+    summary="Bulk-reorder a trip's itinerary items",
+)
+async def reorder_trip_items(
+    db: SessionDep,
+    user: CurrentUser,
+    payload: TripReorder,
+    trip_id: uuid.UUID = Path(..., description="Trip id (UUID)."),
+) -> TripResponse:
+    """Reposition (day_no + sort_order) multiple items in one transaction.
+
+    Every supplied item id must belong to the owned trip; otherwise the request
+    404s and nothing is written.
+    """
+    trip = await trip_service.reorder(db, user=user, trip_id=trip_id, payload=payload)
+    if trip is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND)
     return trip
 
 

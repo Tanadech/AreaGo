@@ -45,6 +45,20 @@ class TripItemUpdate(BaseModel):
     note: str | None = Field(None, max_length=NOTE_MAX)
 
 
+class TripItemOrder(BaseModel):
+    """A single (item id -> position) assignment used by the reorder endpoint."""
+
+    id: uuid.UUID
+    day_no: int = Field(..., ge=1, le=DAYS_MAX)
+    sort_order: int = Field(..., ge=0)
+
+
+class TripReorder(BaseModel):
+    """Bulk reposition of a trip's itinerary items (all in one transaction)."""
+
+    items: list[TripItemOrder] = Field(..., min_length=1)
+
+
 class TripItemResponse(BaseModel):
     """An itinerary item enriched with its place name + coordinates (for the map)."""
 
@@ -126,6 +140,8 @@ __all__ = [
     "TripItemCreate",
     "TripItemUpdate",
     "TripItemResponse",
+    "TripItemOrder",
+    "TripReorder",
     "TripCreate",
     "TripUpdate",
     "TripListItem",
