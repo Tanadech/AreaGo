@@ -7,6 +7,7 @@ import uuid
 
 from sqlalchemy import (
     Boolean,
+    DateTime,
     ForeignKey,
     SmallInteger,
     String,
@@ -124,8 +125,10 @@ class RefreshToken(Base):
     token_hash: Mapped[str] = mapped_column(
         Text, nullable=False, unique=True, index=True
     )
-    expires_at: Mapped[dt.datetime] = mapped_column(nullable=False)
-    revoked_at: Mapped[dt.datetime | None] = mapped_column()
+    expires_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    revoked_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
     replaced_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("refresh_tokens.id")
     )

@@ -13,8 +13,10 @@ SameSite=Strict cookie (Secure when ``COOKIE_SECURE``). The access token is
 returned in the JSON body for the client to send as a Bearer header.
 """
 
-from __future__ import annotations
-
+# NOTE: this module intentionally does NOT use `from __future__ import annotations`.
+# slowapi's @limiter.limit wraps the endpoints, and FastAPI then resolves string
+# annotations against the wrapper's globals — which misclassifies `payload`/`session`
+# as query params (-> spurious 422). Real (eagerly-evaluated) annotations avoid this.
 from fastapi import APIRouter, Request, Response, status
 
 from app.core.config import get_settings
