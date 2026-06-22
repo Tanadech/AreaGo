@@ -1,0 +1,86 @@
+# AreaScan Tourism Platform — local orchestration
+# One-command boot:  docker compose up --build
+# Then open the web app at http://localhost:3000 (API at http://localhost:8000/api/v1)
+#
+# In-network service hosts are 'db' and 'redis' (used by the api service below).
+# On the host machine these map to localhost:5432 / localhost:6379.
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: areascan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: areascan
+      POSTGRES_PASSWORD: areascan
+      POSTGRES_DB: areascan
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U areascan -d areascan"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: areascan-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: ./apps/api
+    container_name: areascan-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://areascan:areascan@db:5432/areascan
+      SYNC_DATABASE_URL: postgresql+psycopg://areascan:areascan@db:5432/areascan
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: dev-insecure-change-me
+      ACCESS_TOKEN_TTL_MIN: "15"
+      REFRESH_TOKEN_TTL_DAYS: "7"
+      CORS_ORIGINS: http://localhost:3000
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_MAPS_SERVER_KEY: ${GOOGLE_MAPS_SERVER_KEY:-}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: ./apps/web
+      # NEXT_PUBLIC_* are baked into the client bundle at build time (not runtime).
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
+        NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID: ${NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID:-}
+    container_name: areascan-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
+  redisdata:

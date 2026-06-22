@@ -1,0 +1,2 @@
+# Placeholder so the empty `modules/` directory is tracked by git.
+# Reusable Terraform modules (cloud-run, cloud-sql, redis, ...) go here.

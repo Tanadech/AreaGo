@@ -1,0 +1,2 @@
+# Placeholder for the PROD environment root module.
+# Mirror envs/dev/main.tf here when PROD is provisioned.
