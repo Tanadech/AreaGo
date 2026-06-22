@@ -1,13 +1,13 @@
-# GCP Deployment Runbook — `travel-planner-499706`
+# GCP Deployment Runbook — `metal-incline-499706-f8`
 
-> รันบน **project เดียว** ที่มีอยู่: `travel-planner-499706` · region `asia-southeast1` · Cloud SQL instance `travel-db`.
+> รันบน **project เดียว** ที่มีอยู่: `metal-incline-499706-f8` · region `asia-southeast1` · Cloud SQL instance `travel-db`.
 > คำสั่งทั้งหมดสมมติว่า `gcloud auth login` แล้ว. ตั้ง project ก่อน:
 > ```bash
-> gcloud config set project travel-planner-499706
-> export PROJECT_ID=travel-planner-499706
+> gcloud config set project metal-incline-499706-f8
+> export PROJECT_ID=metal-incline-499706-f8
 > export REGION=asia-southeast1
 > export SQL_INSTANCE=travel-db
-> export CONN_NAME=$PROJECT_ID:$REGION:$SQL_INSTANCE   # travel-planner-499706:asia-southeast1:travel-db
+> export CONN_NAME=$PROJECT_ID:$REGION:$SQL_INSTANCE   # metal-incline-499706-f8:asia-southeast1:travel-db
 > ```
 
 ## สถานะปัจจุบัน (facts)
@@ -66,7 +66,7 @@ gcloud artifacts repositories create areascan \
   --description="AreaScan container images"
 
 gcloud auth configure-docker $REGION-docker.pkg.dev   # ให้ docker push ได้
-# image path: asia-southeast1-docker.pkg.dev/travel-planner-499706/areascan/<api|web>:<tag>
+# image path: asia-southeast1-docker.pkg.dev/metal-incline-499706-f8/areascan/<api|web>:<tag>
 ```
 
 ## STEP 4 — Secret Manager (ไม่มี secret ใน repo/compose ตอน deploy)

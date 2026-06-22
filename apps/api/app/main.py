@@ -53,7 +53,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Instantiate the engine and redis client so pools are ready to serve the
     # first request. Connectivity itself is validated lazily by the health check.
     get_engine()
-    get_redis_client()
+    # Redis is optional: if it isn't configured/reachable, keep serving (rate
+    # limiting falls back to in-memory storage). Never let it crash startup.
+    try:
+        get_redis_client()
+    except Exception:  # noqa: BLE001 - startup must not depend on Redis
+        logger.warning("redis client unavailable at startup; continuing without it")
 
     try:
         yield
